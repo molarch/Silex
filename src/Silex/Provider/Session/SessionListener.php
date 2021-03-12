@@ -31,10 +31,6 @@ class SessionListener extends BaseSessionListener
 
     protected function getSession(): ?SessionInterface
     {
-        if (!isset($this->app['session'])) {
-            return;
-        }
-
-        return $this->app['session'];
+        return $this->app['session'] ?? null;
     }
 }
