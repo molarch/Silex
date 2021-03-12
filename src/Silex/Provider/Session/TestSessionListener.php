@@ -27,6 +27,7 @@ class TestSessionListener extends BaseTestSessionListener
     public function __construct(Container $app)
     {
         $this->app = $app;
+        parent::__construct(new \Pimple\Psr11\Container($app));
     }
 
     protected function getSession(): ?SessionInterface
