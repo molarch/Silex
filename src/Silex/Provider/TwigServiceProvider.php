@@ -27,6 +27,12 @@ use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\Form\FormRenderer;
+use Twig\Environment;
+use Twig\Extension\DebugExtension;
+use Twig\Loader\ArrayLoader;
+use Twig\Loader\ChainLoader;
+use Twig\Loader\FilesystemLoader;
+use Twig\Extension\CoreExtension;
 
 /**
  * Twig integration for Silex.
@@ -56,7 +62,7 @@ class TwigServiceProvider implements ServiceProviderInterface
             // deprecated and should probably be removed in Silex 3.0
             $twig->addGlobal('app', $app);
 
-            $coreExtension = $twig->getExtension('Twig_Extension_Core');
+            $coreExtension = $twig->getExtension(CoreExtension::class);
 
             $coreExtension->setDateFormat($app['twig.date.format'], $app['twig.date.interval_format']);
 
@@ -67,10 +73,10 @@ class TwigServiceProvider implements ServiceProviderInterface
             $coreExtension->setNumberFormat($app['twig.number_format.decimals'], $app['twig.number_format.decimal_point'], $app['twig.number_format.thousands_separator']);
 
             if ($app['debug']) {
-                $twig->addExtension(new \Twig_Extension_Debug());
+                $twig->addExtension(new DebugExtension());
             }
 
-            if (class_exists('Symfony\Bridge\Twig\Extension\RoutingExtension')) {
+            if (class_exists(RoutingExtension::class)) {
                 $app['twig.app_variable'] = function ($app) {
                     $var = new AppVariable();
                     if (isset($app['security.token_storage'])) {
@@ -116,7 +122,7 @@ class TwigServiceProvider implements ServiceProviderInterface
                     };
 
                     $app['twig.form.renderer'] = function ($app) {
-                        $csrfTokenManager = isset($app['csrf.token_manager']) ? $app['csrf.token_manager'] : null;
+                        $csrfTokenManager = $app['csrf.token_manager'] ?? null;
 
                         return new FormRenderer($app['twig.form.engine'], $csrfTokenManager);
                     };
@@ -124,9 +130,9 @@ class TwigServiceProvider implements ServiceProviderInterface
                     $twig->addExtension(new FormExtension());
 
                     // add loader for Symfony built-in form templates
-                    $reflected = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
+                    $reflected = new \ReflectionClass(FormExtension::class);
                     $path = dirname($reflected->getFileName()).'/../Resources/views/Form';
-                    $app['twig.loader']->addLoader(new \Twig_Loader_Filesystem($path));
+                    $app['twig.loader']->addLoader(new FilesystemLoader($path));
                 }
 
                 if (isset($app['var_dumper.cloner'])) {
@@ -140,7 +146,7 @@ class TwigServiceProvider implements ServiceProviderInterface
         };
 
         $app['twig.loader.filesystem'] = function ($app) {
-            $loader = new \Twig_Loader_Filesystem();
+            $loader = new FilesystemLoader();
             foreach (is_array($app['twig.path']) ? $app['twig.path'] : [$app['twig.path']] as $key => $val) {
                 if (is_string($key)) {
                     $loader->addPath($key, $val);
@@ -153,18 +159,18 @@ class TwigServiceProvider implements ServiceProviderInterface
         };
 
         $app['twig.loader.array'] = function ($app) {
-            return new \Twig_Loader_Array($app['twig.templates']);
+            return new ArrayLoader($app['twig.templates']);
         };
 
         $app['twig.loader'] = function ($app) {
-            return new \Twig_Loader_Chain([
+            return new ChainLoader([
                 $app['twig.loader.array'],
                 $app['twig.loader.filesystem'],
             ]);
         };
 
         $app['twig.environment_factory'] = $app->protect(function ($app) {
-            return new \Twig_Environment($app['twig.loader'], array_replace([
+            return new Environment($app['twig.loader'], array_replace([
                 'charset' => $app['charset'],
                 'debug' => $app['debug'],
                 'strict_variables' => $app['debug'],

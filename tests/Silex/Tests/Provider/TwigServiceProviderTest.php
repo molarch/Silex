@@ -19,6 +19,10 @@ use Silex\Provider\FormServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\AssetServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
+use Twig\Extension\CoreExtension;
+use Symfony\Component\Form\FormRenderer;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 
 /**
  * TwigProvider test cases.
@@ -107,9 +111,9 @@ class TwigServiceProviderTest extends TestCase
         $app->register(new CsrfServiceProvider());
         $app->register(new TwigServiceProvider());
 
-        $this->assertInstanceOf('Twig_Environment', $app['twig']);
-        $this->assertInstanceOf('Symfony\Bridge\Twig\Form\TwigRendererEngine', $app['twig.form.engine']);
-        $this->assertInstanceOf('Symfony\Component\Form\FormRenderer', $app['twig.form.renderer']);
+        $this->assertInstanceOf(Environment::class, $app['twig']);
+        $this->assertInstanceOf(TwigRendererEngine::class, $app['twig.form.engine']);
+        $this->assertInstanceOf(FormRenderer::class, $app['twig.form.renderer']);
     }
 
     public function testFormWithoutCsrf()
@@ -138,9 +142,9 @@ class TwigServiceProviderTest extends TestCase
 
         $twig = $app['twig'];
 
-        $this->assertSame(['Y-m-d', '%h hours'], $twig->getExtension('Twig_Extension_Core')->getDateFormat());
-        $this->assertSame($timezone, $twig->getExtension('Twig_Extension_Core')->getTimezone());
-        $this->assertSame([2, ',', ' '], $twig->getExtension('Twig_Extension_Core')->getNumberFormat());
+        $this->assertSame(['Y-m-d', '%h hours'], $twig->getExtension(CoreExtension::class)->getDateFormat());
+        $this->assertSame($timezone, $twig->getExtension(CoreExtension::class)->getTimezone());
+        $this->assertSame([2, ',', ' '], $twig->getExtension(CoreExtension::class)->getNumberFormat());
     }
 
     public function testWebLinkIntegration()
