@@ -20,7 +20,7 @@ class CallbackResolverTest extends Testcase
     private $app;
     private $resolver;
 
-    public function setup()
+    public function setup(): void
     {
         $this->app = new Container();
         $this->resolver = new CallbackResolver($this->app);
