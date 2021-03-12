@@ -1,9 +1,12 @@
 {
-    "name": "silexit/silex",
+    "name": "silexandfriends/silex",
     "description": "The PHP micro-framework based on the Symfony Components",
     "keywords": ["microframework"],
     "homepage": "https://silex.symfony.com",
     "license": "MIT",
+    "config": {
+        "sort-packages": true
+    },
     "authors": [
         {
             "name": "Fabien Potencier",
@@ -41,7 +44,6 @@
         "symfony/monolog-bridge": "^4.0",
         "symfony/doctrine-bridge": "^4.0",
         "symfony/options-resolver": "^4.0",
-        "symfony/phpunit-bridge": "^3.2",
         "symfony/process": "^4.0",
         "symfony/serializer": "^4.0",
         "symfony/translation": "^4.0",
@@ -52,7 +54,9 @@
         "doctrine/dbal": "^2.2",
         "swiftmailer/swiftmailer": "^5",
         "monolog/monolog": "^1.4.1",
-        "symfony/web-link": "^4.0"
+        "symfony/web-link": "^4.0",
+        "rector/rector-prefixed": "^0.9.31",
+        "symfony/phpunit-bridge": "^5.0"
     },
     "replace": {
         "silex/api": "self.version",
