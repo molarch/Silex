@@ -1,5 +1,5 @@
 {
-    "name": "silex/silex",
+    "name": "silexit/silex",
     "description": "The PHP micro-framework based on the Symfony Components",
     "keywords": ["microframework"],
     "homepage": "https://silex.symfony.com",
@@ -12,10 +12,14 @@
         {
             "name": "Igor Wiedler",
             "email": "igor@wiedler.ch"
+        },
+        {
+            "name": "Roberto Nygaard",
+            "email": "roberto@nygaard.es"
         }
     ],
     "require": {
-        "php": ">=7.1.3",
+        "php": ">=7.4|^8.0",
         "pimple/pimple": "^3.0",
         "symfony/event-dispatcher": "^4.0",
         "symfony/http-foundation": "^4.0",
@@ -52,7 +56,8 @@
     },
     "replace": {
         "silex/api": "self.version",
-        "silex/providers": "self.version"
+        "silex/providers": "self.version",
+        "silex/silex": "self.version"
     },
     "autoload": {
         "psr-4": { "Silex\\": "src/Silex" }
