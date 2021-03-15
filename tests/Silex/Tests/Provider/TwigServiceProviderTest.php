@@ -23,6 +23,7 @@ use Twig\Environment;
 use Twig\Extension\CoreExtension;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Twig\Loader\LoaderInterface;
 
 /**
  * TwigProvider test cases.
@@ -31,7 +32,7 @@ use Symfony\Bridge\Twig\Form\TwigRendererEngine;
  */
 class TwigServiceProviderTest extends TestCase
 {
-    public function testRegisterAndRender()
+    public function testRegisterAndRender(): void
     {
         $app = new Application();
 
@@ -45,26 +46,26 @@ class TwigServiceProviderTest extends TestCase
 
         $request = Request::create('/hello/john');
         $response = $app->handle($request);
-        $this->assertEquals('Hello john!', $response->getContent());
+        self::assertEquals('Hello john!', $response->getContent());
     }
 
-    public function testLoaderPriority()
+    public function testLoaderPriority(): void
     {
         $app = new Application();
         $app->register(new TwigServiceProvider(), [
             'twig.templates' => ['foo' => 'foo'],
         ]);
-        $loader = $this->getMockBuilder('\Twig_LoaderInterface')->getMock();
-        if (method_exists('\Twig_LoaderInterface', 'getSourceContext')) {
-            $loader->expects($this->never())->method('getSourceContext');
+        $loader = $this->getMockBuilder(LoaderInterface::class)->getMock();
+        if (method_exists(LoaderInterface::class, 'getSourceContext')) {
+            $loader->expects(self::never())->method('getSourceContext');
         }
         $app['twig.loader.filesystem'] = function ($app) use ($loader) {
             return $loader;
         };
-        $this->assertEquals('foo', $app['twig.loader']->getSourceContext('foo')->getCode());
+        self::assertEquals('foo', $app['twig.loader']->getSourceContext('foo')->getCode());
     }
 
-    public function testHttpFoundationIntegration()
+    public function testHttpFoundationIntegration(): void
     {
         $app = new Application();
         $app['request_stack']->push(Request::create('/dir1/dir2/file'));
@@ -75,11 +76,11 @@ class TwigServiceProviderTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('http://localhost/dir1/dir2/foo.css', $app['twig']->render('absolute'));
-        $this->assertEquals('../foo.css', $app['twig']->render('relative'));
+        self::assertEquals('http://localhost/dir1/dir2/foo.css', $app['twig']->render('absolute'));
+        self::assertEquals('../foo.css', $app['twig']->render('relative'));
     }
 
-    public function testAssetIntegration()
+    public function testAssetIntegration(): void
     {
         $app = new Application();
         $app->register(new TwigServiceProvider(), [
@@ -89,10 +90,10 @@ class TwigServiceProviderTest extends TestCase
             'assets.version' => 1,
         ]);
 
-        $this->assertEquals('/foo.css?1', $app['twig']->render('hello'));
+        self::assertEquals('/foo.css?1', $app['twig']->render('hello'));
     }
 
-    public function testGlobalVariable()
+    public function testGlobalVariable(): void
     {
         $app = new Application();
         $app['request_stack']->push(Request::create('/?name=Fabien'));
@@ -101,31 +102,31 @@ class TwigServiceProviderTest extends TestCase
             'twig.templates' => ['hello' => '{{ global.request.get("name") }}'],
         ]);
 
-        $this->assertEquals('Fabien', $app['twig']->render('hello'));
+        self::assertEquals('Fabien', $app['twig']->render('hello'));
     }
 
-    public function testFormFactory()
+    public function testFormFactory(): void
     {
         $app = new Application();
         $app->register(new FormServiceProvider());
         $app->register(new CsrfServiceProvider());
         $app->register(new TwigServiceProvider());
 
-        $this->assertInstanceOf(Environment::class, $app['twig']);
-        $this->assertInstanceOf(TwigRendererEngine::class, $app['twig.form.engine']);
-        $this->assertInstanceOf(FormRenderer::class, $app['twig.form.renderer']);
+        self::assertInstanceOf(Environment::class, $app['twig']);
+        self::assertInstanceOf(TwigRendererEngine::class, $app['twig.form.engine']);
+        self::assertInstanceOf(FormRenderer::class, $app['twig.form.renderer']);
     }
 
-    public function testFormWithoutCsrf()
+    public function testFormWithoutCsrf(): void
     {
         $app = new Application();
         $app->register(new FormServiceProvider());
         $app->register(new TwigServiceProvider());
 
-        $this->assertInstanceOf('Twig_Environment', $app['twig']);
+        self::assertInstanceOf('Twig_Environment', $app['twig']);
     }
 
-    public function testFormatParameters()
+    public function testFormatParameters(): void
     {
         $app = new Application();
 
@@ -142,12 +143,12 @@ class TwigServiceProviderTest extends TestCase
 
         $twig = $app['twig'];
 
-        $this->assertSame(['Y-m-d', '%h hours'], $twig->getExtension(CoreExtension::class)->getDateFormat());
-        $this->assertSame($timezone, $twig->getExtension(CoreExtension::class)->getTimezone());
-        $this->assertSame([2, ',', ' '], $twig->getExtension(CoreExtension::class)->getNumberFormat());
+        self::assertSame(['Y-m-d', '%h hours'], $twig->getExtension(CoreExtension::class)->getDateFormat());
+        self::assertSame($timezone, $twig->getExtension(CoreExtension::class)->getTimezone());
+        self::assertSame([2, ',', ' '], $twig->getExtension(CoreExtension::class)->getNumberFormat());
     }
 
-    public function testWebLinkIntegration()
+    public function testWebLinkIntegration(): void
     {
         $app = new Application();
         $app['request_stack']->push($request = Request::create('/'));
@@ -157,9 +158,9 @@ class TwigServiceProviderTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('/foo.css', $app['twig']->render('preload'));
+        self::assertEquals('/foo.css', $app['twig']->render('preload'));
 
         $link = new Link('preload', '/foo.css');
-        $this->assertEquals([$link], array_values($request->attributes->get('_links')->getLinks()));
+        self::assertEquals([$link], array_values($request->attributes->get('_links')->getLinks()));
     }
 }

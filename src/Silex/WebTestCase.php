@@ -22,12 +22,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends TestCase
 {
-    /**
-     * HttpKernelInterface instance.
-     *
-     * @var HttpKernelInterface
-     */
-    protected $app;
+
+    protected HttpKernelInterface $app;
 
     /**
      * PHPUnit setUp for setting up the application.
@@ -54,9 +50,9 @@ abstract class WebTestCase extends TestCase
      *
      * @return Client A Client instance
      */
-    public function createClient(array $server = [])
+    public function createClient(array $server = []): Client
     {
-        if (!class_exists('Symfony\Component\BrowserKit\Client')) {
+        if (!class_exists(\Symfony\Component\BrowserKit\Client::class)) {
             throw new \LogicException('Component "symfony/browser-kit" is required by WebTestCase.'.PHP_EOL.'Run composer require symfony/browser-kit');
         }
 
