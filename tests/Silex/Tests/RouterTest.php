@@ -16,6 +16,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Router test cases.
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class RouterTest extends TestCase
 {
-    public function testMapRouting()
+    public function testMapRouting(): void
     {
         $app = new Application();
 
@@ -45,7 +46,7 @@ class RouterTest extends TestCase
         $this->checkRouteResponse($app, '/', 'root');
     }
 
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $app = new Application();
 
@@ -63,15 +64,15 @@ class RouterTest extends TestCase
 
         $request = Request::create('/created', 'put');
         $response = $app->handle($request);
-        $this->assertEquals(201, $response->getStatusCode());
+        self::assertEquals(201, $response->getStatusCode());
 
         $request = Request::create('/forbidden');
         $response = $app->handle($request);
-        $this->assertEquals(403, $response->getStatusCode());
+        self::assertEquals(403, $response->getStatusCode());
 
         $request = Request::create('/not_found');
         $response = $app->handle($request);
-        $this->assertEquals(404, $response->getStatusCode());
+        self::assertEquals(404, $response->getStatusCode());
     }
 
     public function testRedirect()
@@ -88,18 +89,16 @@ class RouterTest extends TestCase
 
         $request = Request::create('/redirect');
         $response = $app->handle($request);
-        $this->assertTrue($response->isRedirect('/target'));
+        self::assertTrue($response->isRedirect('/target'));
 
         $request = Request::create('/redirect2');
         $response = $app->handle($request);
-        $this->assertTrue($response->isRedirect('/target2'));
+        self::assertTrue($response->isRedirect('/target2'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function testMissingRoute()
+    public function testMissingRoute(): void
     {
+        $this->expectException(NotFoundHttpException::class);
         $app = new Application();
         unset($app['exception_handler']);
 
@@ -107,7 +106,7 @@ class RouterTest extends TestCase
         $app->handle($request);
     }
 
-    public function testMethodRouting()
+    public function testMethodRouting(): void
     {
         $app = new Application();
 
@@ -149,7 +148,7 @@ class RouterTest extends TestCase
         $this->checkRouteResponse($app, '/resource', 'delete resource', 'delete');
     }
 
-    public function testRequestShouldBeStoredRegardlessOfRouting()
+    public function testRequestShouldBeStoredRegardlessOfRouting(): void
     {
         $app = new Application();
 
@@ -164,11 +163,11 @@ class RouterTest extends TestCase
         foreach (['/foo', '/bar'] as $path) {
             $request = Request::create($path);
             $response = $app->handle($request);
-            $this->assertContains($path, $response->getContent());
+            self::assertStringContainsString($path, $response->getContent());
         }
     }
 
-    public function testTrailingSlashBehavior()
+    public function testTrailingSlashBehavior(): void
     {
         $app = new Application();
 
@@ -179,19 +178,19 @@ class RouterTest extends TestCase
         $request = Request::create('/foo');
         $response = $app->handle($request);
 
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('/foo/', $response->getTargetUrl());
+        self::assertEquals(301, $response->getStatusCode());
+        self::assertEquals('/foo/', $response->getTargetUrl());
     }
 
-    public function testHostSpecification()
+    public function testHostSpecification(): void
     {
         $route = new \Silex\Route();
 
-        $this->assertSame($route, $route->host('{locale}.example.com'));
-        $this->assertEquals('{locale}.example.com', $route->getHost());
+        self::assertSame($route, $route->host('{locale}.example.com'));
+        self::assertEquals('{locale}.example.com', $route->getHost());
     }
 
-    public function testRequireHttpRedirect()
+    public function testRequireHttpRedirect(): void
     {
         $app = new Application();
 
@@ -202,10 +201,10 @@ class RouterTest extends TestCase
 
         $request = Request::create('https://example.com/secured');
         $response = $app->handle($request);
-        $this->assertTrue($response->isRedirect('http://example.com/secured'));
+        self::assertTrue($response->isRedirect('http://example.com/secured'));
     }
 
-    public function testRequireHttpsRedirect()
+    public function testRequireHttpsRedirect(): void
     {
         $app = new Application();
 
@@ -216,10 +215,10 @@ class RouterTest extends TestCase
 
         $request = Request::create('http://example.com/secured');
         $response = $app->handle($request);
-        $this->assertTrue($response->isRedirect('https://example.com/secured'));
+        self::assertTrue($response->isRedirect('https://example.com/secured'));
     }
 
-    public function testRequireHttpsRedirectIncludesQueryString()
+    public function testRequireHttpsRedirectIncludesQueryString(): void
     {
         $app = new Application();
 
@@ -230,10 +229,10 @@ class RouterTest extends TestCase
 
         $request = Request::create('http://example.com/secured?query=string');
         $response = $app->handle($request);
-        $this->assertTrue($response->isRedirect('https://example.com/secured?query=string'));
+        self::assertTrue($response->isRedirect('https://example.com/secured?query=string'));
     }
 
-    public function testConditionOnRoute()
+    public function testConditionOnRoute(): void
     {
         $app = new Application();
         $app->match('/secured', function () {
@@ -243,10 +242,10 @@ class RouterTest extends TestCase
 
         $request = Request::create('http://example.com/secured');
         $response = $app->handle($request);
-        $this->assertEquals(404, $response->getStatusCode());
+        self::assertEquals(404, $response->getStatusCode());
     }
 
-    public function testClassNameControllerSyntax()
+    public function testClassNameControllerSyntax(): void
     {
         $app = new Application();
 
@@ -255,7 +254,7 @@ class RouterTest extends TestCase
         $this->checkRouteResponse($app, '/foo', 'foo');
     }
 
-    public function testClassNameControllerSyntaxWithStaticMethod()
+    public function testClassNameControllerSyntaxWithStaticMethod(): void
     {
         $app = new Application();
 
@@ -264,11 +263,11 @@ class RouterTest extends TestCase
         $this->checkRouteResponse($app, '/bar', 'bar');
     }
 
-    protected function checkRouteResponse(Application $app, $path, $expectedContent, $method = 'get', $message = null)
+    protected function checkRouteResponse(Application $app, $path, $expectedContent, $method = 'get', $message = ''): void
     {
         $request = Request::create($path, $method);
         $response = $app->handle($request);
-        $this->assertEquals($expectedContent, $response->getContent(), $message);
+        self::assertEquals($expectedContent, $response->getContent(), $message);
     }
 }
 

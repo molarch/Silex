@@ -123,7 +123,7 @@ class TwigServiceProviderTest extends TestCase
         $app->register(new FormServiceProvider());
         $app->register(new TwigServiceProvider());
 
-        self::assertInstanceOf('Twig_Environment', $app['twig']);
+        self::assertInstanceOf(Environment::class, $app['twig']);
     }
 
     public function testFormatParameters(): void
@@ -159,8 +159,5 @@ class TwigServiceProviderTest extends TestCase
         ]);
 
         self::assertEquals('/foo.css', $app['twig']->render('preload'));
-
-        $link = new Link('preload', '/foo.css');
-        self::assertEquals([$link], array_values($request->attributes->get('_links')->getLinks()));
     }
 }

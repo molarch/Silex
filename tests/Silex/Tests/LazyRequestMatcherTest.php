@@ -14,6 +14,7 @@ namespace Silex\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Provider\Routing\LazyRequestMatcher;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 
 /**
  * LazyRequestMatcher test case.
@@ -28,7 +29,7 @@ class LazyRequestMatcherTest extends TestCase
     public function testUserMatcherIsCreatedLazily()
     {
         $callCounter = 0;
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->getMockBuilder(RequestMatcherInterface::class)->getMock();
 
         $matcher = new LazyRequestMatcher(function () use ($requestMatcher, &$callCounter) {
             ++$callCounter;
@@ -42,12 +43,10 @@ class LazyRequestMatcherTest extends TestCase
         $this->assertEquals(1, $callCounter);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Factory supplied to LazyRequestMatcher must return implementation of Symfony\Component\Routing\RequestMatcherInterface.
-     */
-    public function testThatCanInjectRequestMatcherOnly()
+    public function testThatCanInjectRequestMatcherOnly(): void
     {
+        $this->expectExceptionMessage("Factory supplied to LazyRequestMatcher must return implementation of Symfony\Component\Routing\RequestMatcherInterface.");
+        $this->expectException(\LogicException::class);
         $matcher = new LazyRequestMatcher(function () {
             return 'someMatcher';
         });
@@ -62,11 +61,11 @@ class LazyRequestMatcherTest extends TestCase
     public function testMatchIsProxy()
     {
         $request = Request::create('path');
-        $matcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $matcher = $this->getMockBuilder(RequestMatcherInterface::class)->getMock();
         $matcher->expects($this->once())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->returnValue('matcherReturnValue'));
+            ->willReturn('matcherReturnValue');
 
         $matcher = new LazyRequestMatcher(function () use ($matcher) {
             return $matcher;

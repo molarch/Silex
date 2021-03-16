@@ -28,7 +28,7 @@ class TranslationServiceProviderTest extends TestCase
     /**
      * @return Application
      */
-    protected function getPreparedApp()
+    protected function getPreparedApp(): Application
     {
         $app = new Application();
 
@@ -57,7 +57,7 @@ class TranslationServiceProviderTest extends TestCase
         return $app;
     }
 
-    public function transChoiceProvider()
+    public function transChoiceProvider(): array
     {
         return [
             ['key2', 0, null, '0 apples'],
@@ -72,7 +72,7 @@ class TranslationServiceProviderTest extends TestCase
         ];
     }
 
-    public function transProvider()
+    public function transProvider(): array
     {
         return [
             ['key1', null, 'The translation'],
@@ -87,61 +87,61 @@ class TranslationServiceProviderTest extends TestCase
     /**
      * @dataProvider transProvider
      */
-    public function testTransForDefaultLanguage($key, $locale, $expected)
+    public function testTransForDefaultLanguage($key, $locale, $expected): void
     {
         $app = $this->getPreparedApp();
 
         $result = $app['translator']->trans($key, [], null, $locale);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
      * @dataProvider transChoiceProvider
      */
-    public function testTransChoiceForDefaultLanguage($key, $number, $locale, $expected)
+    public function testTransChoiceForDefaultLanguage($key, $number, $locale, $expected): void
     {
         $app = $this->getPreparedApp();
 
-        $result = $app['translator']->transChoice($key, $number, ['%count%' => $number], null, $locale);
-        $this->assertEquals($expected, $result);
+        $result = $app['translator']->trans($key, ['%count%' => $number], null, $locale);
+        self::assertEquals($expected, $result);
     }
 
-    public function testFallbacks()
+    public function testFallbacks(): void
     {
         $app = $this->getPreparedApp();
         $app['locale_fallbacks'] = ['de', 'en'];
 
         // fallback to english
         $result = $app['translator']->trans('key_only_english', [], null, 'ru');
-        $this->assertEquals('Foo', $result);
+        self::assertEquals('Foo', $result);
 
         // fallback to german
         $result = $app['translator']->trans('key1', [], null, 'ru');
-        $this->assertEquals('The german translation', $result);
+        self::assertEquals('The german translation', $result);
     }
 
-    public function testLocale()
+    public function testLocale(): void
     {
         $app = $this->getPreparedApp();
         $app->get('/', function () use ($app) { return $app['translator']->getLocale(); });
         $response = $app->handle(Request::create('/'));
-        $this->assertEquals('en', $response->getContent());
+        self::assertEquals('en', $response->getContent());
 
         $app = $this->getPreparedApp();
         $app->get('/', function () use ($app) { return $app['translator']->getLocale(); });
         $request = Request::create('/');
         $request->setLocale('fr');
         $response = $app->handle($request);
-        $this->assertEquals('fr', $response->getContent());
+        self::assertEquals('fr', $response->getContent());
 
         $app = $this->getPreparedApp();
         $app->get('/{_locale}', function () use ($app) { return $app['translator']->getLocale(); });
         $response = $app->handle(Request::create('/es'));
-        $this->assertEquals('es', $response->getContent());
+        self::assertEquals('es', $response->getContent());
     }
 
-    public function testLocaleInSubRequests()
+    public function testLocaleInSubRequests(): void
     {
         $app = $this->getPreparedApp();
         $app->get('/embed/{_locale}', function () use ($app) { return $app['translator']->getLocale(); });
@@ -151,7 +151,7 @@ class TranslationServiceProviderTest extends TestCase
                    $app['translator']->getLocale();
         });
         $response = $app->handle(Request::create('/fr'));
-        $this->assertEquals('fresfr', $response->getContent());
+        self::assertEquals('fresfr', $response->getContent());
 
         $app = $this->getPreparedApp();
         $app->get('/embed', function () use ($app) { return $app['translator']->getLocale(); });
@@ -162,10 +162,10 @@ class TranslationServiceProviderTest extends TestCase
         });
         $response = $app->handle(Request::create('/fr'));
         // locale in sub-request must be "en" as this is the value if the sub-request is converted to an ESI
-        $this->assertEquals('frenfr', $response->getContent());
+        self::assertEquals('frenfr', $response->getContent());
     }
 
-    public function testLocaleWithBefore()
+    public function testLocaleWithBefore(): void
     {
         $app = $this->getPreparedApp();
         $app->before(function (Request $request) { $request->setLocale('fr'); }, Application::EARLY_EVENT);
@@ -177,6 +177,6 @@ class TranslationServiceProviderTest extends TestCase
         });
         $response = $app->handle(Request::create('/'));
         // locale in sub-request is "en" as the before filter is only executed for the main request
-        $this->assertEquals('frenfr', $response->getContent());
+        self::assertEquals('frenfr', $response->getContent());
     }
 }

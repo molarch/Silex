@@ -20,6 +20,7 @@ use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -63,6 +64,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Symfony Security component Provider.
@@ -83,7 +85,7 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
         $app['security.role_hierarchy'] = [];
         $app['security.access_rules'] = [];
         $app['security.hide_user_not_found'] = true;
-        $app['security.encoder.bcrypt.cost'] = 13;
+        $app['security.encoder.native.cost'] = 13;
 
         $app['security.authorization_checker'] = function ($app) {
             return new AuthorizationChecker($app['security.token_storage'], $app['security.authentication_manager'], $app['security.access_manager']);
@@ -115,21 +117,20 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
         // by default, all users use the digest encoder
         $app['security.encoder_factory'] = function ($app) {
             return new EncoderFactory([
-                'Symfony\Component\Security\Core\User\UserInterface' => $app['security.default_encoder'],
+                UserInterface::class => $app['security.default_encoder'],
             ]);
         };
 
-        // by default, all users use the BCrypt encoder
         $app['security.default_encoder'] = function ($app) {
-            return $app['security.encoder.bcrypt'];
+            return $app['security.encoder.native'];
         };
 
         $app['security.encoder.digest'] = function ($app) {
             return new MessageDigestPasswordEncoder();
         };
 
-        $app['security.encoder.bcrypt'] = function ($app) {
-            return new BCryptPasswordEncoder($app['security.encoder.bcrypt.cost']);
+        $app['security.encoder.native'] = function ($app) {
+            return new NativePasswordEncoder(null, null, $app['security.encoder.native.cost']);
         };
 
         $app['security.encoder.pbkdf2'] = function ($app) {
@@ -167,8 +168,8 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
             return new ChannelListener(
                 $app['security.access_map'],
                 new RetryAuthenticationEntryPoint(
-                    isset($app['request.http_port']) ? $app['request.http_port'] : 80,
-                    isset($app['request.https_port']) ? $app['request.https_port'] : 443
+                    $app['request.http_port'] ?? 80,
+                    $app['request.https_port'] ?? 443
                 ),
                 $app['logger']
             );
@@ -219,13 +220,13 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
             $configs = [];
             foreach ($app['security.firewalls'] as $name => $firewall) {
                 $entryPoint = null;
-                $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
-                $users = isset($firewall['users']) ? $firewall['users'] : [];
+                $pattern = $firewall['pattern'] ?? null;
+                $users = $firewall['users'] ?? [];
                 $security = isset($firewall['security']) ? (bool) $firewall['security'] : true;
                 $stateless = isset($firewall['stateless']) ? (bool) $firewall['stateless'] : false;
-                $context = isset($firewall['context']) ? $firewall['context'] : $name;
-                $hosts = isset($firewall['hosts']) ? $firewall['hosts'] : null;
-                $methods = isset($firewall['methods']) ? $firewall['methods'] : null;
+                $context = $firewall['context'] ?? $name;
+                $hosts = $firewall['hosts'] ?? null;
+                $methods = $firewall['methods'] ?? null;
                 unset($firewall['pattern'], $firewall['users'], $firewall['security'], $firewall['stateless'], $firewall['context'], $firewall['methods'], $firewall['hosts']);
                 $protected = false === $security ? false : count($firewall);
                 $listeners = ['security.channel_listener'];
@@ -358,8 +359,7 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
                 $app['security.token_storage'],
                 $app['security.access_manager'],
                 $app['security.access_map'],
-                $app['security.authentication_manager'],
-                $app['logger']
+                $app['security.authentication_manager']
             );
         };
 

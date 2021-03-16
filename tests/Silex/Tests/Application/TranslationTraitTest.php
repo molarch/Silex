@@ -13,29 +13,22 @@ namespace Silex\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
 use Silex\Provider\TranslationServiceProvider;
+use Symfony\Component\Translation\Translator;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TranslationTraitTest extends TestCase
 {
-    public function testTrans()
+    public function testTrans(): void
     {
         $app = $this->createApplication();
-        $app['translator'] = $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')->disableOriginalConstructor()->getMock();
-        $translator->expects($this->once())->method('trans');
+        $app['translator'] = $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
+        $translator->expects(self::once())->method('trans');
         $app->trans('foo');
     }
 
-    public function testTransChoice()
-    {
-        $app = $this->createApplication();
-        $app['translator'] = $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')->disableOriginalConstructor()->getMock();
-        $translator->expects($this->once())->method('transChoice');
-        $app->transChoice('foo', 2);
-    }
-
-    public function createApplication()
+    public function createApplication(): TranslationApplication
     {
         $app = new TranslationApplication();
         $app->register(new TranslationServiceProvider());

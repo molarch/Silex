@@ -46,6 +46,7 @@ trait TranslationTrait
      */
     public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
-        return $this['translator']->transChoice($id, $number, $parameters, $domain, $locale);
+        $parameters['%count%'] ??= $number;
+        return $this->trans($id, $parameters, $domain, $locale);
     }
 }

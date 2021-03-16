@@ -26,7 +26,7 @@ class CallbackResolverTest extends Testcase
         $this->resolver = new CallbackResolver($this->app);
     }
 
-    public function testShouldResolveCallback()
+    public function testShouldResolveCallback(): void
     {
         $callable = function () {};
         $this->app['some_service'] = function () { return new \ArrayObject(); };
@@ -46,7 +46,7 @@ class CallbackResolverTest extends Testcase
     /**
      * @dataProvider nonStringsAreNotValidProvider
      */
-    public function testNonStringsAreNotValid($name)
+    public function testNonStringsAreNotValid($name): void
     {
         $this->assertFalse($this->resolver->isValid($name));
     }
@@ -61,12 +61,12 @@ class CallbackResolverTest extends Testcase
     }
 
     /**
-     * @expectedException          \InvalidArgumentException
-     * @expectedExceptionMessageRegExp  /Service "[a-z_]+" is not callable./
      * @dataProvider shouldThrowAnExceptionIfServiceIsNotCallableProvider
      */
-    public function testShouldThrowAnExceptionIfServiceIsNotCallable($name)
+    public function testShouldThrowAnExceptionIfServiceIsNotCallable($name): void
     {
+        $this->expectExceptionMessageMatches("/Service \"[a-z_]+\" is not callable./");
+        $this->expectException(\InvalidArgumentException::class);
         $this->app['non_callable_obj'] = function () { return new \stdClass(); };
         $this->app['non_callable'] = function () { return []; };
         $this->resolver->convertCallback($name);

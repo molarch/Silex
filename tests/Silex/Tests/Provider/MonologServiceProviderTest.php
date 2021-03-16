@@ -58,7 +58,7 @@ class MonologServiceProviderTest extends TestCase
         $this->assertTrue($app['monolog.handler']->hasDebug('< 200'));
 
         $records = $app['monolog.handler']->getRecords();
-        $this->assertContains('Matched route "{route}".', $records[0]['message']);
+        $this->assertStringContainsString('Matched route "{route}".', $records[0]['message']);
         $this->assertSame('GET_foo', $records[0]['context']['route']);
     }
 
@@ -174,12 +174,10 @@ class MonologServiceProviderTest extends TestCase
         $this->assertSame(Logger::INFO, $app['monolog.handler']->getLevel());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Provided logging level 'foo' does not exist. Must be a valid monolog logging level.
-     */
     public function testNonExistentStringErrorLevel(): void
     {
+        $this->expectExceptionMessage("Provided logging level 'foo' does not exist. Must be a valid monolog logging level.");
+        $this->expectException(\InvalidArgumentException::class);
         $app = $this->getApplication();
         $app['monolog.level'] = 'foo';
 

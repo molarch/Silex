@@ -14,6 +14,7 @@ namespace Silex\EventListener;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -78,11 +79,11 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs uncaught exceptions on event KernelEvents::EXCEPTION.
      *
-     * @param GetResponseForExceptionEvent $event
+     * @param ExceptionEvent $event
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
-        $this->logException($event->getException());
+        $this->logException($event->getThrowable());
     }
 
     /**
@@ -114,7 +115,7 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Exception $e)
+    protected function logException(\Throwable $e)
     {
         $this->logger->log(call_user_func($this->exceptionLogFilter, $e), sprintf('%s: %s (uncaught exception) at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), ['exception' => $e]);
     }

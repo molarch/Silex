@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 
 /**
  * SecurityServiceProvider.
@@ -28,11 +30,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SecurityServiceProviderTest extends WebTestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
     public function testWrongAuthenticationType()
     {
+        $this->expectException(\LogicException::class);
         $app = new Application();
         $app->register(new SecurityServiceProvider(), [
             'security.firewalls' => [
@@ -56,7 +56,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $this->assertEquals('ANONYMOUS', $client->getResponse()->getContent());
 
         $client->request('post', '/login_check', ['_username' => 'fabien', '_password' => 'bar']);
-        $this->assertContains('Bad credentials', $app['security.last_error']($client->getRequest()));
+        $this->assertStringContainsString('Bad credentials', $app['security.last_error']($client->getRequest()));
         // hack to re-close the session as the previous assertions re-opens it
         $client->getRequest()->getSession()->save();
 
@@ -162,7 +162,7 @@ class SecurityServiceProviderTest extends WebTestCase
 
         $app->boot();
 
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator', $app['security.validator.user_password_validator']);
+        $this->assertInstanceOf(UserPasswordValidator::class, $app['security.validator.user_password_validator']);
     }
 
     public function testExposedExceptions()
@@ -282,7 +282,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $request->headers->set('PHP_AUTH_USER', 'fabien');
         $request->headers->set('PHP_AUTH_PW', 'foo');
         $app->handle($request);
-        $this->assertInstanceOf('Symfony\Component\Security\Core\User\UserInterface', $app['user']);
+        $this->assertInstanceOf(UserInterface::class, $app['user']);
         $this->assertEquals('fabien', $app['user']->getUsername());
     }
 
@@ -312,7 +312,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $request->headers->set('PHP_AUTH_USER', 'fabien');
         $request->headers->set('PHP_AUTH_PW', 'foo');
         $app->handle($request);
-        $this->assertInstanceOf('Symfony\Component\Security\Core\User\UserInterface', $app['user']);
+        $this->assertInstanceOf(UserInterface::class, $app['user']);
         $this->assertEquals('fabien', $app['user']->getUsername());
     }
 

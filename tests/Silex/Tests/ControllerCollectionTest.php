@@ -173,12 +173,10 @@ class ControllerCollectionTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "mount" method takes either a "ControllerCollection" instance or callable.
-     */
     public function testMountCallableException()
     {
+        $this->expectExceptionMessage("The \"mount\" method takes either a \"ControllerCollection\" instance or callable.");
+        $this->expectException(\LogicException::class);
         $controllers = new ControllerCollection(new Route());
         $controllers->mount('/prefix', '');
     }
@@ -285,11 +283,9 @@ class ControllerCollectionTest extends TestCase
         $this->assertEquals('foo', $route->foo);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testRouteMethodDoesNotExist()
     {
+        $this->expectException(\BadMethodCallException::class);
         $route = new MyRoute1();
 
         $controller = new ControllerCollection($route);

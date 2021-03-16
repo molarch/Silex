@@ -27,6 +27,7 @@ use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\HttpFoundation\UrlHelper;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\ArrayLoader;
@@ -93,7 +94,7 @@ class TwigServiceProvider implements ServiceProviderInterface
                 $twig->addGlobal('global', $app['twig.app_variable']);
 
                 if (isset($app['request_stack'])) {
-                    $twig->addExtension(new HttpFoundationExtension($app['request_stack']));
+                    $twig->addExtension(new HttpFoundationExtension(new UrlHelper($app['request_stack'])));
                     $twig->addExtension(new RoutingExtension($app['url_generator']));
                     $twig->addExtension(new WebLinkExtension($app['request_stack']));
                 }
@@ -109,7 +110,7 @@ class TwigServiceProvider implements ServiceProviderInterface
                 if (isset($app['fragment.handler'])) {
                     $app['fragment.renderer.hinclude']->setTemplating($twig);
 
-                    $twig->addExtension(new HttpKernelExtension($app['fragment.handler']));
+                    $twig->addExtension(new HttpKernelExtension());
                 }
 
                 if (isset($app['assets.packages'])) {

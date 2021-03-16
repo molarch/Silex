@@ -12,10 +12,10 @@
 namespace Silex;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
  * Wraps exception listeners.
@@ -39,9 +39,9 @@ class ExceptionListenerWrapper
         $this->callback = $callback;
     }
 
-    public function __invoke(GetResponseForExceptionEvent $event)
+    public function __invoke(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $this->callback = $this->app['callback_resolver']->resolveCallback($this->callback);
 
         if (!$this->shouldRun($exception)) {
@@ -55,7 +55,7 @@ class ExceptionListenerWrapper
         $this->ensureResponse($response, $event);
     }
 
-    protected function shouldRun(\Exception $exception)
+    protected function shouldRun(\Throwable $exception): bool
     {
         if (is_array($this->callback)) {
             $callbackReflection = new \ReflectionMethod($this->callback[0], $this->callback[1]);
@@ -77,13 +77,13 @@ class ExceptionListenerWrapper
         return true;
     }
 
-    protected function ensureResponse($response, GetResponseForExceptionEvent $event)
+    protected function ensureResponse($response, ExceptionEvent $event): void
     {
         if ($response instanceof Response) {
             $event->setResponse($response);
         } else {
-            $viewEvent = new GetResponseForControllerResultEvent($this->app['kernel'], $event->getRequest(), $event->getRequestType(), $response);
-            $this->app['dispatcher']->dispatch(KernelEvents::VIEW, $viewEvent);
+            $viewEvent = new ViewEvent($this->app['kernel'], $event->getRequest(), $event->getRequestType(), $response);
+            $this->app['dispatcher']->dispatch($viewEvent, KernelEvents::VIEW);
 
             if ($viewEvent->hasResponse()) {
                 $event->setResponse($viewEvent->getResponse());
