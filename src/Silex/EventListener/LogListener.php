@@ -14,29 +14,28 @@ namespace Silex\EventListener;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Logs request, response, and exceptions.
  */
 class LogListener implements EventSubscriberInterface
 {
-    protected $logger;
+    protected LoggerInterface $logger;
     protected $exceptionLogFilter;
 
     public function __construct(LoggerInterface $logger, $exceptionLogFilter = null)
     {
         $this->logger = $logger;
         if (null === $exceptionLogFilter) {
-            $exceptionLogFilter = function (\Exception $e) {
+            $exceptionLogFilter = function (\Throwable $e) {
                 if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
                     return LogLevel::ERROR;
                 }
@@ -51,9 +50,9 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs master requests on event KernelEvents::REQUEST.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -65,9 +64,9 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs master response on event KernelEvents::RESPONSE.
      *
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -81,7 +80,7 @@ class LogListener implements EventSubscriberInterface
      *
      * @param ExceptionEvent $event
      */
-    public function onKernelException(ExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event): void
     {
         $this->logException($event->getThrowable());
     }
@@ -91,7 +90,7 @@ class LogListener implements EventSubscriberInterface
      *
      * @param Request $request
      */
-    protected function logRequest(Request $request)
+    protected function logRequest(Request $request): void
     {
         $this->logger->log(LogLevel::DEBUG, '> '.$request->getMethod().' '.$request->getRequestUri());
     }
@@ -101,7 +100,7 @@ class LogListener implements EventSubscriberInterface
      *
      * @param Response $response
      */
-    protected function logResponse(Response $response)
+    protected function logResponse(Response $response): void
     {
         $message = '< '.$response->getStatusCode();
 
@@ -115,7 +114,7 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Throwable $e)
+    protected function logException(\Throwable $e): void
     {
         $this->logger->log(call_user_func($this->exceptionLogFilter, $e), sprintf('%s: %s (uncaught exception) at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), ['exception' => $e]);
     }

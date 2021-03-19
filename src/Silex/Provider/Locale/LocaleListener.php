@@ -12,13 +12,13 @@
 namespace Silex\Provider\Locale;
 
 use Pimple\Container;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Initializes the locale based on the current request.
@@ -41,7 +41,7 @@ class LocaleListener implements EventSubscriberInterface
         $this->requestContext = $requestContext;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         $request->setDefaultLocale($this->defaultLocale);
@@ -59,14 +59,14 @@ class LocaleListener implements EventSubscriberInterface
         }
     }
 
-    private function setLocale(Request $request)
+    private function setLocale(Request $request): void
     {
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
         }
     }
 
-    private function setRouterContext(Request $request)
+    private function setRouterContext(Request $request): void
     {
         if (null !== $this->requestContext) {
             $this->requestContext->setParameter('_locale', $request->getLocale());

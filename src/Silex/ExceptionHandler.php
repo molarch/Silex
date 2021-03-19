@@ -11,8 +11,10 @@
 
 namespace Silex;
 
-use Symfony\Component\Debug\ExceptionHandler as DebugExceptionHandler;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -32,16 +34,24 @@ class ExceptionHandler implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    public function onSilexError(ExceptionEvent $event)
+    public function onSilexError(ExceptionEvent $event): void
     {
-        $handler = new DebugExceptionHandler($this->debug);
-
         $exception = $event->getThrowable();
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::createFromThrowable($exception);
         }
 
-        $response = Response::create($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders())->setCharset(ini_get('default_charset'));
+        if ($this->debug) {
+            Debug::enable();
+        }
+        ErrorHandler::register();
+
+        $charset = ini_get('default_charset');
+
+        $renderer = new HtmlErrorRenderer($this->debug, $charset);
+        $render = $renderer->getBody($exception);
+
+        $response = Response::create($render, $exception->getStatusCode(), $exception->getHeaders())->setCharset($charset);
 
         $event->setResponse($response);
     }

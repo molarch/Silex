@@ -657,8 +657,6 @@ class ApplicationTest extends TestCase
 
     public function testWebLinkListener()
     {
-        $this->markTestSkipped('Link is not found');
-
         $app = new Application();
 
         $app->get('/', function () {

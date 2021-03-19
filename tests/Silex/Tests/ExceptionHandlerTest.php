@@ -35,7 +35,7 @@ class ExceptionHandlerTest extends TestCase
 
         $request = Request::create('/foo');
         $response = $app->handle($request);
-        self::assertStringContainsString('Whoops, looks like something went wrong.', $response->getContent());
+        self::assertStringContainsString('Oops! An Error Occurred', $response->getContent());
         self::assertEquals(500, $response->getStatusCode());
     }
 
@@ -62,7 +62,7 @@ class ExceptionHandlerTest extends TestCase
 
         $request = Request::create('/foo');
         $response = $app->handle($request);
-        $this->assertStringContainsString('Sorry, the page you are looking for could not be found.', $response->getContent());
+        $this->assertStringContainsString('The server returned a "404 Not Found".', $response->getContent());
         self::assertEquals(404, $response->getStatusCode());
     }
 
@@ -86,7 +86,7 @@ class ExceptionHandlerTest extends TestCase
 
         $request = Request::create('/foo', 'POST');
         $response = $app->handle($request);
-        self::assertStringContainsString('Whoops, looks like something went wrong.', $response->getContent());
+        self::assertStringContainsString('Oops! An Error Occurred', $response->getContent());
         self::assertEquals(405, $response->getStatusCode());
         self::assertEquals('GET', $response->headers->get('Allow'));
     }

@@ -13,14 +13,13 @@ namespace Silex\Provider;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Silex\Api\EventListenerProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
-use Silex\Api\EventListenerProviderInterface;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Symfony Translation component Provider.

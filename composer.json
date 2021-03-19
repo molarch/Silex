@@ -31,11 +31,12 @@
     },
     "require-dev": {
         "doctrine/dbal": "^2.2",
+        "fig/link-util": "^1.1",
         "monolog/monolog": "^1.4.1",
         "rector/rector-prefixed": "^0.9.31",
         "swiftmailer/swiftmailer": "^5",
         "symfony/asset": "^4.0",
-        "symfony/browser-kit": "^4.0",
+        "symfony/browser-kit": "^4.4",
         "symfony/config": "^4.0",
         "symfony/css-selector": "^4.0",
         "symfony/debug": "^4.0",

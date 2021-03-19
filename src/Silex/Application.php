@@ -13,26 +13,26 @@ namespace Silex;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Silex\Api\BootableProviderInterface;
+use Silex\Api\ControllerProviderInterface;
+use Silex\Api\EventListenerProviderInterface;
+use Silex\Provider\ExceptionHandlerServiceProvider;
+use Silex\Provider\HttpKernelServiceProvider;
+use Silex\Provider\RoutingServiceProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Silex\Api\BootableProviderInterface;
-use Silex\Api\EventListenerProviderInterface;
-use Silex\Api\ControllerProviderInterface;
-use Silex\Provider\ExceptionHandlerServiceProvider;
-use Silex\Provider\RoutingServiceProvider;
-use Silex\Provider\HttpKernelServiceProvider;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
  * The Silex framework class.
@@ -242,11 +242,11 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      * @param int   $priority The higher this value, the earlier an event
      *                        listener will be triggered in the chain (defaults to 0)
      */
-    public function before($callback, $priority = 0)
+    public function before($callback, $priority = 0): void
     {
         $app = $this;
 
-        $this->on(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($callback, $app) {
+        $this->on(KernelEvents::REQUEST, function (RequestEvent $event) use ($callback, $app) {
             if (!$event->isMasterRequest()) {
                 return;
             }
@@ -272,7 +272,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         $app = $this;
 
-        $this->on(KernelEvents::RESPONSE, function (FilterResponseEvent $event) use ($callback, $app) {
+        $this->on(KernelEvents::RESPONSE, function (ResponseEvent $event) use ($callback, $app) {
             if (!$event->isMasterRequest()) {
                 return;
             }
@@ -299,7 +299,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         $app = $this;
 
-        $this->on(KernelEvents::TERMINATE, function (PostResponseEvent $event) use ($callback, $app) {
+        $this->on(KernelEvents::TERMINATE, function (TerminateEvent $event) use ($callback, $app) {
             call_user_func($app['callback_resolver']->resolveCallback($callback), $event->getRequest(), $event->getResponse(), $app);
         }, $priority);
     }

@@ -12,9 +12,9 @@
 namespace Silex\EventListener;
 
 use Silex\CallbackResolver;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -42,9 +42,9 @@ class ConverterListener implements EventSubscriberInterface
     /**
      * Handles converters.
      *
-     * @param FilterControllerEvent $event The event to handle
+     * @param ControllerEvent $event The event to handle
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();
         $route = $this->routes->get($request->attributes->get('_route'));
@@ -52,7 +52,7 @@ class ConverterListener implements EventSubscriberInterface
             foreach ($converters as $name => $callback) {
                 $callback = $this->callbackResolver->resolveCallback($callback);
 
-                $request->attributes->set($name, call_user_func($callback, $request->attributes->get($name), $request));
+                $request->attributes->set($name, $callback($request->attributes->get($name), $request));
             }
         }
     }
