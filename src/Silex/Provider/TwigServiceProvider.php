@@ -108,8 +108,6 @@ class TwigServiceProvider implements ServiceProviderInterface
                 }
 
                 if (isset($app['fragment.handler'])) {
-                    $app['fragment.renderer.hinclude']->setTemplating($twig);
-
                     $twig->addExtension(new HttpKernelExtension());
                 }
 
