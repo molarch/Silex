@@ -54,7 +54,7 @@ class ExceptionHandler implements EventSubscriberInterface
 
         $html = sprintf('<style>%s</style>%s', $css, $body);
 
-        $response = (new Response($body, $exception->getStatusCode(), $exception->getHeaders()))->setCharset($charset);
+        $response = (new Response($html, $exception->getStatusCode(), $exception->getHeaders()))->setCharset($charset);
 
         $event->setResponse($response);
     }
