@@ -44,7 +44,7 @@ class HttpFragmentServiceProvider implements ServiceProviderInterface, EventList
         };
 
         $app['fragment.renderer.hinclude'] = function ($app) {
-            $renderer = new HIncludeFragmentRenderer(null, $app['uri_signer'], $app['fragment.renderer.hinclude.global_template'], $app['charset']);
+            $renderer = new HIncludeFragmentRenderer($app['twig'], $app['uri_signer'], $app['fragment.renderer.hinclude.global_template'], $app['charset']);
             $renderer->setFragmentPath($app['fragment.path']);
 
             return $renderer;

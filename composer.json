@@ -23,40 +23,39 @@
     ],
     "require": {
         "php": ">=7.4|^8.0",
-        "pimple/pimple": "^3.0",
-        "symfony/event-dispatcher": "^4.0",
-        "symfony/http-foundation": "^4.0",
-        "symfony/http-kernel": "^4.0",
-        "symfony/routing": "^4.0"
+        "pimple/pimple": "^3.4",
+        "symfony/event-dispatcher": "^5.2",
+        "symfony/http-foundation": "^5.2",
+        "symfony/http-kernel": "^5.2",
+        "symfony/monolog-bridge": "^5.2",
+        "symfony/routing": "^5.2",
+        "symfony/security-bundle": "^5.2"
     },
     "require-dev": {
         "doctrine/dbal": "^2.2",
         "fig/link-util": "^1.1",
-        "monolog/monolog": "^1.4.1",
+        "monolog/monolog": "^2.2",
         "rector/rector-prefixed": "^0.9.31",
-        "swiftmailer/swiftmailer": "^5",
-        "symfony/asset": "^4.0",
-        "symfony/browser-kit": "^4.4",
-        "symfony/config": "^4.0",
-        "symfony/css-selector": "^4.0",
-        "symfony/debug": "^4.0",
-        "symfony/doctrine-bridge": "^4.0",
-        "symfony/dom-crawler": "^4.0",
-        "symfony/expression-language": "^4.0",
-        "symfony/finder": "^4.0",
-        "symfony/form": "^4.0",
-        "symfony/intl": "^4.0",
-        "symfony/monolog-bridge": "^4.0",
-        "symfony/options-resolver": "^4.0",
-        "symfony/phpunit-bridge": "^5.0",
-        "symfony/process": "^4.0",
-        "symfony/security": "^4.0",
-        "symfony/serializer": "^4.0",
-        "symfony/translation": "^4.0",
-        "symfony/twig-bridge": "^4.0",
-        "symfony/validator": "^4.0",
-        "symfony/var-dumper": "^4.0",
-        "symfony/web-link": "^4.0",
+        "swiftmailer/swiftmailer": "^6.2",
+        "symfony/asset": "^5.2",
+        "symfony/browser-kit": "^5.2",
+        "symfony/config": "^5.2",
+        "symfony/css-selector": "^5.2",
+        "symfony/doctrine-bridge": "^5.2",
+        "symfony/dom-crawler": "^5.2",
+        "symfony/expression-language": "^5.2",
+        "symfony/finder": "^5.2",
+        "symfony/form": "^5.2",
+        "symfony/intl": "^5.2",
+        "symfony/options-resolver": "^5.2",
+        "symfony/phpunit-bridge": "^5.2",
+        "symfony/process": "^5.2",
+        "symfony/serializer": "^5.2",
+        "symfony/translation": "^5.2",
+        "symfony/twig-bridge": "^5.2",
+        "symfony/validator": "^5.2",
+        "symfony/var-dumper": "^5.2",
+        "symfony/web-link": "^5.2",
         "twig/twig": "^3"
     },
     "replace": {
@@ -72,7 +71,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4.x-dev"
+            "dev-master": "2.5.x-dev"
         }
     }
 }
