@@ -67,7 +67,7 @@ class MonologServiceProviderTest extends TestCase
         $app = $this->getApplication();
 
         $app->get('/log', function () use ($app) {
-            $app['monolog']->addDebug('logging a message');
+            $app['monolog']->debug('logging a message');
         });
 
         $this->assertFalse($app['monolog.handler']->hasDebugRecords());
@@ -176,7 +176,7 @@ class MonologServiceProviderTest extends TestCase
 
     public function testNonExistentStringErrorLevel(): void
     {
-        $this->expectExceptionMessage("Provided logging level 'foo' does not exist. Must be a valid monolog logging level.");
+        $this->expectExceptionMessage('Level "foo" is not defined, use one of: 100, 200, 250, 300, 400, 500, 550, 600');
         $this->expectException(\InvalidArgumentException::class);
         $app = $this->getApplication();
         $app['monolog.level'] = 'foo';

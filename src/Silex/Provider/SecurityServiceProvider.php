@@ -457,7 +457,7 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
                     $app['security.http_utils'],
                     $options
                 );
-                $handler->setProviderKey($name);
+                $handler->setFirewallName($name);
 
                 return $handler;
             };
