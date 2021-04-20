@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
@@ -592,7 +593,7 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
                 if (true === $invalidateSession && false === $options['stateless']) {
                     $eventDispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) {
                         $sessionHandler = new SessionLogoutHandler();
-                        $sessionHandler->logout($event->getRequest(), $event->getResponse(), $event->getToken());
+                        $sessionHandler->logout($event->getRequest(), $event->getResponse(), $event->getToken() ?? new NullToken());
                     });
                 }
 
