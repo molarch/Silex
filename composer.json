@@ -39,7 +39,7 @@
         "doctrine/dbal": "^2.13",
         "fig/link-util": "^1.2",
         "monolog/monolog": "^2.9",
-        "rector/rector-prefixed": "^0.9.31",
+        "rector/rector": "^0.18.0",
         "swiftmailer/swiftmailer": "^6.3",
         "symfony/asset": "^5.4",
         "symfony/browser-kit": "^5.4",

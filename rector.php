@@ -2,23 +2,26 @@
 
 declare(strict_types=1);
 
-use Rector\Core\Configuration\Option;
-use Rector\Php74\Rector\Property\TypedPropertyRector;
-use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
+use Rector\Config\RectorConfig;
+use Rector\Core\ValueObject\PhpVersion;
+use Rector\Set\ValueObject\LevelSetList;
+use Rector\Symfony\Set\SymfonyLevelSetList;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    // get parameters
-    $parameters = $containerConfigurator->parameters();
-
-    // Define what rule sets will be applied
-    $parameters->set(Option::SETS, [
-        SetList::DEAD_CODE,
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
     ]);
-
-    // get services (needed for register a single rule)
-    // $services = $containerConfigurator->services();
+    $rectorConfig->importNames();
+    $rectorConfig->importShortClasses(false);
+    $rectorConfig->phpVersion(PhpVersion::PHP_81);
 
     // register a single rule
-    // $services->set(TypedPropertyRector::class);
+    $rectorConfig->rule(InlineConstructorDefaultToPropertyRector::class);
+
+    // define sets of rules
+    $rectorConfig->sets([
+        SymfonyLevelSetList::UP_TO_SYMFONY_54
+    ]);
 };
