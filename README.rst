@@ -21,7 +21,7 @@ components`_:
 
     $app->run();
 
-Silex works with PHP 7.1.3 or later.
+Silex works with PHP 8.1 or later.
 
 Installation
 ------------
@@ -30,7 +30,7 @@ The recommended way to install Silex is through `Composer`_:
 
 .. code-block:: bash
 
-    composer require silex/silex "~2.0"
+    composer require silex/silex "^3.1"
 
 Alternatively, you can download the `silex.zip`_ file and extract it.
 
