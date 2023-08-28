@@ -13,6 +13,8 @@ namespace Silex\Provider;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
@@ -33,7 +35,13 @@ class CsrfServiceProvider implements ServiceProviderInterface
 
         $app['csrf.token_storage'] = function ($app) {
             if (isset($app['session'])) {
-                return new SessionTokenStorage($app['session'], $app['csrf.session_namespace']);
+                //return new SessionTokenStorage($app['request_stack'], $app['csrf.session_namespace']);
+                // Force the current session
+                $request = new Request();
+                $request->setSession($app['session']);
+                $requestStack = new RequestStack();
+                $requestStack->push($request);
+                return new SessionTokenStorage($requestStack, $app['csrf.session_namespace']);
             }
 
             return new NativeSessionTokenStorage($app['csrf.session_namespace']);
