@@ -11,6 +11,7 @@
 
 namespace Silex\Tests;
 
+use Silex\Route;
 use PHPUnit\Framework\TestCase;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -184,7 +185,7 @@ class RouterTest extends TestCase
 
     public function testHostSpecification(): void
     {
-        $route = new \Silex\Route();
+        $route = new Route();
 
         self::assertSame($route, $route->host('{locale}.example.com'));
         self::assertEquals('{locale}.example.com', $route->getHost());

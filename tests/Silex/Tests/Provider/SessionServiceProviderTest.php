@@ -11,6 +11,8 @@
 
 namespace Silex\Tests\Provider;
 
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Silex\Application;
 use Silex\Provider\SessionServiceProvider;
 use Silex\WebTestCase;
@@ -105,8 +107,8 @@ class SessionServiceProviderTest extends WebTestCase
     {
         $app = new Application();
 
-        $attrs = new Session\Attribute\AttributeBag();
-        $flash = new Session\Flash\FlashBag();
+        $attrs = new AttributeBag();
+        $flash = new FlashBag();
         $app->register(new SessionServiceProvider(), [
             'session.attribute_bag' => $attrs,
             'session.flash_bag' => $flash,

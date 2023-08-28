@@ -11,6 +11,7 @@
 
 namespace Silex\Tests\Provider;
 
+use Silex\Tests\Provider\FormServiceProviderTest\DisableCsrfExtension;
 use PHPUnit\Framework\TestCase;
 use Silex\Application;
 use Silex\Provider\FormServiceProvider;
@@ -305,7 +306,7 @@ class FormServiceProviderTest extends TestCase
         $app['session.test'] = true;
 
         $app->extend('form.type.extensions', function ($extensions) {
-            $extensions[] = new FormServiceProviderTest\DisableCsrfExtension();
+            $extensions[] = new DisableCsrfExtension();
 
             return $extensions;
         });

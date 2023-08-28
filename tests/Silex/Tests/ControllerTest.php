@@ -11,6 +11,7 @@
 
 namespace Silex\Tests;
 
+use Silex\Exception\ControllerFrozenException;
 use PHPUnit\Framework\TestCase;
 use Silex\Controller;
 use Silex\Route;
@@ -33,7 +34,7 @@ class ControllerTest extends TestCase
 
     public function testBindOnFrozenControllerShouldThrowException()
     {
-        $this->expectException(\Silex\Exception\ControllerFrozenException::class);
+        $this->expectException(ControllerFrozenException::class);
         $controller = new Controller(new Route('/foo'));
         $controller->bind('foo');
         $controller->freeze();

@@ -11,6 +11,7 @@
 
 namespace Silex\Tests\Provider;
 
+use Silex\Provider\SecurityServiceProvider;
 use PHPUnit\Framework\TestCase;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\TestHandler;
@@ -146,7 +147,7 @@ class MonologServiceProviderTest extends TestCase
         $app = $this->getApplication();
         $app['monolog.level'] = Logger::ERROR;
 
-        $app->register(new \Silex\Provider\SecurityServiceProvider(), [
+        $app->register(new SecurityServiceProvider(), [
             'security.firewalls' => [
                 'admin' => [
                     'pattern' => '^/admin',

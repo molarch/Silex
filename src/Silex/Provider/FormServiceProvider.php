@@ -11,6 +11,7 @@
 
 namespace Silex\Provider;
 
+use Silex\Provider\Form\SilexFormExtension;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -56,7 +57,7 @@ class FormServiceProvider implements ServiceProviderInterface
         };
 
         $app['form.extension.silex'] = function ($app) {
-            return new Form\SilexFormExtension($app, $app['form.types'], $app['form.type.extensions'], $app['form.type.guessers']);
+            return new SilexFormExtension($app, $app['form.types'], $app['form.type.extensions'], $app['form.type.guessers']);
         };
 
         $app['form.extensions'] = function ($app) {

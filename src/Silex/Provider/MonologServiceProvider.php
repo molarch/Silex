@@ -12,6 +12,9 @@
 namespace Silex\Provider;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\GroupHandler;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\StreamHandler;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Monolog\Formatter\LineFormatter;
@@ -54,9 +57,9 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
         $app['monolog'] = function ($app) use ($bridge) {
             $log = new $app['monolog.logger.class']($app['monolog.name']);
 
-            $handler = new Handler\GroupHandler($app['monolog.handlers']);
+            $handler = new GroupHandler($app['monolog.handlers']);
             if (isset($app['monolog.not_found_activation_strategy'])) {
-                $handler = new Handler\FingersCrossedHandler($handler, $app['monolog.not_found_activation_strategy']);
+                $handler = new FingersCrossedHandler($handler, $app['monolog.not_found_activation_strategy']);
             }
 
             $log->pushHandler($handler);
@@ -75,7 +78,7 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
         $app['monolog.handler'] = $defaultHandler = function () use ($app) {
             $level = MonologServiceProvider::translateLevel($app['monolog.level']);
 
-            $handler = new Handler\StreamHandler($app['monolog.logfile'], $level, $app['monolog.bubble'], $app['monolog.permission']);
+            $handler = new StreamHandler($app['monolog.logfile'], $level, $app['monolog.bubble'], $app['monolog.permission']);
             $handler->setFormatter($app['monolog.formatter']);
 
             return $handler;
