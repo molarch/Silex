@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\EventListener\TestSessionListener as BaseTestSessionListener;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -27,12 +27,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class TestSessionListener implements EventSubscriberInterface
 {
     private Container $app;
-    private BaseTestSessionListener $testSessionListener;
+    private SessionListener $testSessionListener;
 
     public function __construct(Container $app)
     {
         $this->app = $app;
-        $this->testSessionListener = new BaseTestSessionListener(new \Pimple\Psr11\Container($app));
+        $this->testSessionListener = new SessionListener(new \Pimple\Psr11\Container($app));
     }
 
     protected function getSession(): ?SessionInterface
