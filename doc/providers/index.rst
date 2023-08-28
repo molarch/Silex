@@ -8,7 +8,7 @@ Built-in Service Providers
     asset
     monolog
     session
-    swiftmailer
+    mailer
     locale
     translation
     validator

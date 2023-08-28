@@ -64,7 +64,7 @@ the ``Silex\Provider`` namespace:
 * :doc:`SerializerServiceProvider <providers/serializer>`
 * :doc:`ServiceControllerServiceProvider <providers/service_controller>`
 * :doc:`SessionServiceProvider <providers/session>`
-* :doc:`SwiftmailerServiceProvider <providers/swiftmailer>`
+* :doc:`MailerServiceProvider <providers/mailer>`
 * :doc:`TranslationServiceProvider <providers/translation>`
 * :doc:`TwigServiceProvider <providers/twig>`
 * :doc:`ValidatorServiceProvider <providers/validator>`

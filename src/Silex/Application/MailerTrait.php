@@ -11,22 +11,23 @@
 
 namespace Silex\Application;
 
+use Symfony\Component\Mime\Email;
 /**
- * Swiftmailer trait.
+ * Mailer trait.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-trait SwiftmailerTrait
+trait MailerTrait
 {
     /**
      * Sends an email.
      *
-     * @param \Swift_Message $message          A \Swift_Message instance
+     * @param Email $message A \Email instance
      * @param array          $failedRecipients An array of failures by-reference
      *
      * @return int The number of sent messages
      */
-    public function mail(\Swift_Message $message, &$failedRecipients = null)
+    public function mail(Email $message, &$failedRecipients = null)
     {
         return $this['mailer']->send($message, $failedRecipients);
     }

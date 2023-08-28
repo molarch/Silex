@@ -153,7 +153,7 @@ It is pretty straightforward.
 
 .. note::
 
-    There is a :doc:`SwiftmailerServiceProvider <providers/swiftmailer>`
+    There is a :doc:`MailerServiceProvider <providers/mailer>`
     included that you can use instead of ``mail()``.
 
 The current ``request`` is automatically injected by Silex to the Closure
@@ -538,7 +538,7 @@ setting a more specific type hint for the Closure argument::
         $app->error(function (\Exception $e, Request $request, $code, GetResponseForExceptionEvent $event) {
             $event->allowCustomResponseCode();
             $response = new Response('No Content', 204);
-            
+
             return $response;
         });
 
@@ -755,7 +755,7 @@ use them, define your own Application class and include the traits you want::
         use Application\SecurityTrait;
         use Application\FormTrait;
         use Application\UrlGeneratorTrait;
-        use Application\SwiftmailerTrait;
+        use Application\MailerTrait;
         use Application\MonologTrait;
         use Application\TranslationTrait;
     }

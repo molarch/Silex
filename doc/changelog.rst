@@ -1,10 +1,11 @@
 Changelog
 =========
 
-2.3.1 (2018-XX-XX)
+3.2.0 (2023-XX-XX)
 ------------------
 
- * n/a
+ * Fork from SilexAndFriends/Silex release 3.1
+ * Migrated fro Swiftmailer to Symfony Mailer
 
 2.3.0 (2018-04-20)
 ------------------

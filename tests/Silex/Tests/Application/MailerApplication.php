@@ -11,9 +11,10 @@
 
 namespace Silex\Tests\Application;
 
+use Silex\Application\MailerTrait;
 use Silex\Application;
 
-class SwiftmailerApplication extends Application
+class MailerApplication extends Application
 {
-    use Application\SwiftmailerTrait;
+    use MailerTrait;
 }
