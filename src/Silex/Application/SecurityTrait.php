@@ -29,11 +29,11 @@ trait SecurityTrait
      *
      * @return string The encoded password
      *
-     * @throws \RuntimeException when no password encoder could be found for the user
+     * @throws \RuntimeException when no password hasher could be found for the user
      */
-    public function encodePassword(UserInterface $user, $password)
+    public function hashPassword(UserInterface $user, $password)
     {
-        return $this['security.encoder_factory']->getEncoder($user)->encodePassword($password, $user->getSalt());
+        return $this['security.user_password_hasher']->hashPassword($user, $password);
     }
 
     /**

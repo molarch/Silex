@@ -11,6 +11,7 @@
 
 namespace Silex\Tests\Provider;
 
+use Silex\Tests\Provider\SecurityServiceProviderTest\TokenAuthenticator;
 use Silex\Application;
 use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\SessionServiceProvider;
@@ -283,7 +284,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $request->headers->set('PHP_AUTH_PW', 'foo');
         $app->handle($request);
         $this->assertInstanceOf(UserInterface::class, $app['user']);
-        $this->assertEquals('fabien', $app['user']->getUsername());
+        $this->assertEquals('fabien', $app['user']->getUserIdentifier());
     }
 
     public function testUserAsServiceString()
@@ -313,7 +314,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $request->headers->set('PHP_AUTH_PW', 'foo');
         $app->handle($request);
         $this->assertInstanceOf(UserInterface::class, $app['user']);
-        $this->assertEquals('fabien', $app['user']->getUsername());
+        $this->assertEquals('fabien', $app['user']->getUserIdentifier());
     }
 
     public function testUserWithNoToken()
@@ -429,7 +430,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $app->get('/', function () use ($app) {
             $user = $app['security.token_storage']->getToken()->getUser();
 
-            $content = is_object($user) ? $user->getUsername() : 'ANONYMOUS';
+            $content = is_object($user) ? $user->getUserIdentifier() : 'ANONYMOUS';
 
             if ($app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
                 $content .= 'AUTHENTICATED';
@@ -473,7 +474,7 @@ class SecurityServiceProviderTest extends WebTestCase
 
         $app->get('/', function () use ($app) {
             $user = $app['security.token_storage']->getToken()->getUser();
-            $content = is_object($user) ? $user->getUsername() : 'ANONYMOUS';
+            $content = is_object($user) ? $user->getUserIdentifier() : 'ANONYMOUS';
 
             if ($app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_FULLY')) {
                 $content .= 'AUTHENTICATED';
@@ -496,7 +497,7 @@ class SecurityServiceProviderTest extends WebTestCase
     private function addGuardAuthentication($app)
     {
         $app['app.authenticator.token'] = function ($app) {
-            return new SecurityServiceProviderTest\TokenAuthenticator($app);
+            return new TokenAuthenticator($app);
         };
 
         $app->register(new SecurityServiceProvider(), [
@@ -519,7 +520,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $app->get('/', function () use ($app) {
             $user = $app['security.token_storage']->getToken()->getUser();
 
-            $content = is_object($user) ? $user->getUsername() : 'ANONYMOUS';
+            $content = is_object($user) ? $user->getUserIdentifier() : 'ANONYMOUS';
 
             return $content;
         })->bind('homepage');

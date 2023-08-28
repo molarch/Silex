@@ -10,7 +10,7 @@ Parameters
 * **security.hide_user_not_found** (optional): Defines whether to hide user not
   found exception or not. Defaults to ``true``.
 
-* **security.encoder.bcrypt.cost** (optional): Defines BCrypt password encoder cost. Defaults to 13.
+* **security.hasher.bcrypt.cost** (optional): Defines BCrypt password hasher cost. Defaults to 13.
 
 * **security.role_hierarchy**:(optional): Defines a map of roles including other roles.
 
@@ -45,16 +45,16 @@ Services
 * **security.authentication_utils**: Returns the AuthenticationUtils service
   allowing you to get last authentication exception or last username.
 
-* **security.encoder_factory**: Defines the encoding strategies for user
-  passwords (uses ``security.default_encoder``).
+* **security.hasher_factory**: Defines the encoding strategies for user
+  passwords (uses ``security.default_hasher``).
 
-* **security.default_encoder**: The encoder to use by default for all users (BCrypt).
+* **security.default_hasher**: The hasher to use by default for all users (BCrypt).
 
-* **security.encoder.digest**: Digest password encoder.
+* **security.hasher.digest**: Digest password hasher.
 
-* **security.encoder.bcrypt**: BCrypt password encoder.
+* **security.hasher.bcrypt**: BCrypt password hasher.
 
-* **security.encoder.pbkdf2**: Pbkdf2 password encoder.
+* **security.hasher.pbkdf2**: Pbkdf2 password hasher.
 
 * **user**: Returns the current user
 
@@ -176,13 +176,13 @@ Each user is defined with the following information:
 
 The default configuration of the extension enforces encoded passwords. To
 generate a valid encoded password from a raw password, use the
-``security.encoder_factory`` service::
+``security.hasher_factory`` service::
 
-    // find the encoder for a UserInterface instance
-    $encoder = $app['security.encoder_factory']->getEncoder($user);
+    // find the hasher for a UserInterface instance
+    $hasher = $app['security.hasher_factory']->getHasher($user);
 
-    // compute the encoded password for foo
-    $password = $encoder->encodePassword('foo', $user->getSalt());
+    // compute the hashed password for foo
+    $password = $hasher->hashPassword('foo', $user->getSalt());
 
 When the user is authenticated, the user stored in the token is an instance of
 `User
@@ -432,7 +432,7 @@ switch back to their primary account:
         You are an admin but you've switched to another user,
         <a href="?_switch_user=_exit"> exit</a> the switch.
     {% endif %}
-    
+
 Sharing Security Context between multiple Firewalls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -536,7 +536,7 @@ store the users::
             $this->conn = $conn;
         }
 
-        public function loadUserByUsername($username)
+        public function loadUserByIdentifier($username)
         {
             $stmt = $this->conn->executeQuery('SELECT * FROM users WHERE username = ?', array(strtolower($username)));
 
@@ -553,7 +553,7 @@ store the users::
                 throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
             }
 
-            return $this->loadUserByUsername($user->getUsername());
+            return $this->loadUserByIdentifier($user->getUserIdentifier());
         }
 
         public function supportsClass($class)
@@ -603,38 +603,38 @@ sample users::
     provides a user provider class that is able to load users from your
     entities.
 
-Defining a custom Encoder
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Defining a custom Hasher
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, Silex uses the ``BCrypt`` algorithm to encode passwords.
-Additionally, the password is encoded multiple times.
-You can change these defaults by overriding ``security.default_encoder``
-service to return one of the predefined encoders:
+By default, Silex uses the ``BCrypt`` algorithm to hash passwords.
+Additionally, the password is hashed multiple times.
+You can change these defaults by overriding ``security.default_hasher``
+service to return one of the predefined hashers:
 
-* **security.encoder.digest**: Digest password encoder.
+* **security.hasher.digest**: Digest password hasher.
 
-* **security.encoder.bcrypt**: BCrypt password encoder.
+* **security.hasher.bcrypt**: BCrypt password hasher.
 
-* **security.encoder.pbkdf2**: Pbkdf2 password encoder.
+* **security.hasher.pbkdf2**: Pbkdf2 password hasher.
 
 .. code-block:: php
 
-    $app['security.default_encoder'] = function ($app) {
-        return $app['security.encoder.pbkdf2'];
+    $app['security.default_hasher'] = function ($app) {
+        return $app['security.hasher.pbkdf2'];
     };
 
-Or you can define you own, fully customizable encoder::
+Or you can define you own, fully customizable hasher::
 
     use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 
-    $app['security.default_encoder'] = function ($app) {
+    $app['security.default_hasher'] = function ($app) {
         // Plain text (e.g. for debugging)
         return new PlaintextPasswordEncoder();
     };
 
 .. tip::
 
-    You can change the default BCrypt encoding cost by overriding ``security.encoder.bcrypt.cost``
+    You can change the default BCrypt encoding cost by overriding ``security.hasher.bcrypt.cost``
 
 Defining a custom Authentication Provider
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
